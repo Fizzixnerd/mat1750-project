@@ -17,21 +17,24 @@ init_a      % array a
 for clock=1:clockmax
   % Two step temporal discretization, Mixed Method
   
-  XX=X+(dt/2)*interp(u,X,Nb);           % Take half time step? See what membrane does
-  WW = Wall + (dt/2)*interp(u,Wall,Nw); % Target Points
+  XXm=Xm+(dt/2)*interp(u,Xm);           % Take half time step? See what membrane does
+  XXwall = Xwall + (dt/2)*interp(u,Xwall); % Target Points
+  XXoval = Xoval + (dt/2)*interp(u,Xoval);
+  XXround = Xround + (dt/2)*interp(u,Xround);
+  
   Oval(:,1) = 2 + A*sin(pi*Oval_y)*sin(omega*clock*dt);
   
-  ff=spread(Force(XX),XX,Nb);         % New force at this half step
-  FWall = -Krigid*(WW - Wall);          % Target Points
-  ffwall = spread(FWall,WW,Nw);
+  Fm=Force(XXm);
+  Fm(1,:) = Krigid*([2,2]-Xm(1,:));
+  Fm(end,:) = Krigid*([37,2]-Xm(end,:));
+  ff = spread(Fm,XXm) + spread(Krigid*(Wall - XXwall),XXwall) + spread(Krigid*(Oval - XXoval),XXoval) ...
+                                                            + spread(Krigid*(Round - XXround),XXround);         % New force at this half step
   
-  ForceOval = [-A*omega^2*sin(pi*Oval_y)*sin(omega*clock*dt),zeros(N+1,1)];
-  ffoval = spread(ForceOval,Oval,N);
-  
-  ff = ff + ffwall + ffoval;
   [u,uu]=fluid(u,ff);              % Discretized Navier Stokes
   
-  X(2:Nb,:) = X(2:Nb,:) + dt*interp(uu,XX(2:Nb,:),Nb-2);         % New membrane position
+  Xm = Xm + dt*interp(uu,XXm);         % New membrane position
+  Xwall = Xwall + dt*interp(uu,XXwall);
+  Xoval = Xoval + dt*interp(uu,XXoval);
   %Wall = Wall + dt*interp(uu,WW,Nw); %Necessary?
   
   vorticity=(u(xip,:,2)-u(xim,:,2)-u(:,yip,1)+u(:,yim,1))/(2*h);
@@ -41,18 +44,20 @@ for clock=1:clockmax
   valminmax=[min(values),max(values)];
   
   %animation:
-  
-  contour(xgrid,ygrid,vorticity,values)
-  plot(X(:,1),X(:,2),'ko')
-  hold on
-  plot(Wall(:,1),Wall(:,2), 'rs')
-  plot(Oval(:,1),Oval(:,2),'bd')
-  axis([0,40*L,0,4*L])
-  caxis('auto')
-  %axis equal
-  axis manual
-  drawnow
-  hold off
-  
+  if mod(clock, 1) == 0
+      contour(xgrid,ygrid,vorticity,values)
+      plot(Xm(:,1),Xm(:,2),'ko')
+      hold on
+      plot(Xwall(:,1),Xwall(:,2), 'rs')
+      plot(Xround(:,1),Xround(:,2),'rs')
+      plot(Xoval(:,1),Xoval(:,2),'bd')
+      %plot(Oval(:,1),Oval(:,2),'bd')
+      axis([0,40*L,0,4*L])
+      caxis('auto')
+      %axis equal
+      axis manual
+      drawnow
+      hold off
+  end
 end
 

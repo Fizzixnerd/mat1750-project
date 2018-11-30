@@ -1,14 +1,14 @@
-function U=interp(u,X,Nb)
+function U=interp(u,X)
 global h;
 global N xN yN;
-U=zeros(Nb+1,2);
+U=zeros(size(X,1),2);
 
 %U(1,1) = 2;
 %U(Nb+1,1) = 37;
 %U(1,2) = 2;
 %U(Nb+1,2) = 2;
 
-for k=1:Nb+1
+for k=1:size(X,1)
   s=X(k,:)/h;                           % Approx where X is at which (integer) point
   i=floor(s);                           % Gives the integer right below X
   r=s-i;                                % Diff between X and integer below it

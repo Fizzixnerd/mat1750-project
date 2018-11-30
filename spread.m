@@ -1,10 +1,10 @@
-function f=spread(F,X,Nb)
+function f=spread(F,X)
 global h N xN yN dtheta;
 
 c=dtheta/(h*h);
 f=zeros(xN,yN,2);
 
-for k=1:Nb+1
+for k=1:size(X,1)
   s=X(k,:)/h;
   i=floor(s);
   r=s-i;
