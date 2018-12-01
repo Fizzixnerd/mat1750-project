@@ -15,6 +15,8 @@ init_a      % array a
 
 % Each time step
 for clock=1:clockmax
+    
+    tic 
   % Two step temporal discretization, Mixed Method
   
   XXm=Xm+(dt/2)*interp(u,Xm);           % Take half time step? See what membrane does
@@ -44,7 +46,7 @@ for clock=1:clockmax
   valminmax=[min(values),max(values)];
   
   %animation:
-  if mod(clock, 1) == 0
+  if mod(clock, 100) == 0
       contour(xgrid,ygrid,vorticity,values)
       plot(Xm(:,1),Xm(:,2),'ko')
       hold on
@@ -59,5 +61,7 @@ for clock=1:clockmax
       drawnow
       hold off
   end
+  
+  toc 
 end
 
