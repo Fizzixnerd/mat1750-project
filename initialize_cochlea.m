@@ -6,19 +6,22 @@
 % all the code
 % 40 x 4 box, cochlea is 2 from left, 2 from right, 1 from top, 1 from bot
 
+% Sound wave: Standing wave x = 2 + 2A sin(4 pi y) cos( omega t)
+% omega angular frequency, 2pi times the frequency in hertz
+
 %%% THINGS WE NEED TO PLAY AROUND WITH %%%%%%%%%
 
-omega = 10;          % Frequency
-A = 0.2;                % Amplitude
-K_0  = 60;           % Stiffness original: 6e5
-Krigid = 100;         % Stiffness of Walls
-tmax=10     ;                 % End time
-dt=0.01    ;                 % Time step
+omega = 100;          % Frequency - Resemble Real life
+A = 0.2;              % Amplitude
+K_0  = 6e5;           % Stiffness original: 6e5
+Krigid = 5e8;         % Stiffness of Walls
+tmax=1     ;          % End time
+dt=0.00001    ;        % Time step - In seconds
+N  = 8   ;            % Number of points in 1 mm
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 L  = 1.0 ;                      % Length 1mm = 0.1 cm
-N  = 8   ;                      % Number of points in 1 mm
 xN = 40*N    ;               % Number of points x axis
 yN = 4*N    ;                % Number of points y axis
 h  = L/N   ;                    % partition
@@ -48,26 +51,26 @@ mu=0.02   ;                   % Viscosity
 Oval_y = 2 + (0:N)*h;
 Oval_y = Oval_y';
 
-Oval_ip = 2 + (2:N)*h;
-Oval_im = 2 + (1:N-2)*h;
+Round_y = 1 + (0:N)*h;
+Round_y = Round_y';
 
 clockmax=ceil(tmax/dt);
 
 
 % Immersed Boundary Basilar Membrane
-X = zeros(Nb+1,2);
+Xm = zeros(Nb+1,2);
 for k=0:Nb
   theta=k*dtheta;
-  X(k+1,1)= 2*L + theta;
-  X(k+1,2)= 2*L;
+  Xm(k+1,1)= 2*L + theta;
+  Xm(k+1,2)= 2*L;
 end
 
 % Fixed Points
 Wall = zeros(Nw,2);
 for k = 1:Nw1
     theta = k*h;
-    Wall(k+1,1) = 2*L + theta;
-    Wall(k+1,2) = 3*L - theta/70;
+    Wall(k,1) = 2*L + theta;
+    Wall(k,2) = 3*L - theta/70;
 end
 for k = 1:Nw2
     theta = pi*k*h/3;
@@ -81,13 +84,23 @@ for k = 1:Nw3
 end
 Wall = [2 , 3 ; Wall];
 
+Xwall = Wall;
+
 % Oval window
 Oval = zeros(N+1,2);
 Oval(:,1) = 2;
 Oval(:,2) = Oval_y;
 
-% Sound wave: Standing wave x = 2 + 2A sin(4 pi y) cos( omega t)
-% omega angular frequency, 2pi times the frequency in hertz
+Xoval = Oval;
+
+% Round window
+Round = zeros(N+1,2);
+Round(:,1) = 2;
+Round(:,2) = Round_y;
+
+Xround = Round;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 u=zeros(xN,yN,2);
 
@@ -113,9 +126,10 @@ end
 set(gcf,'double','on')
 contour(xgrid,ygrid,vorticity,values)
 hold on
-plot(X(:,1),X(:,2),'ko')
-plot(Wall(:,1),Wall(:,2),'rs')
-plot(Oval(:,1),Oval(:,2),'bd')
+plot(Xm(:,1),Xm(:,2),'ko')
+plot(Xwall(:,1),Xwall(:,2),'rs')
+plot(Xround(:,1),Xround(:,2),'rs')
+plot(Xoval(:,1),Xoval(:,2),'bd')
 axis([0,40*L,0,4*L])
 %caxis(valminmax)
 %axis equal
