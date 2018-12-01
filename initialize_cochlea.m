@@ -11,13 +11,14 @@
 
 %%% THINGS WE NEED TO PLAY AROUND WITH %%%%%%%%%
 
-omega = 100;          % Frequency - Resemble Real life
-A = 0.2;              % Amplitude
-K_0  = 6e5;           % Stiffness original: 6e5
-Krigid = 5e8;         % Stiffness of Walls
-tmax=1     ;          % End time
-dt=0.00001    ;        % Time step - In seconds
-N  = 8   ;            % Number of points in 1 mm
+freq = 25 ;          % omega = 2 pi * Frequency -- freq is in Hertz
+                     % Frequency of middle C 261.6 Hz
+A = 0.2;             % Amplitude -- in mm
+K_0  = 6e4;          % Stiffness membrane: 6e4 g mm^-1 s^-2
+Krigid = 5e6;        % Stiffness of walls: Make it large enough so walls don't move
+tmax=0.05     ;      % End time: Should be 0.05 seconds - Brain take 0.05 seconds to recognize, according to Google.
+dt=0.0001    ;       % Time step - In seconds
+N  = 16   ;          % Number of points in 1 mm
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -47,6 +48,7 @@ Nw  = Nw1 + Nw2 + Nw3;      % Total will be Nw + 1
 
 rho=1     ;                   % Density
 mu=0.02   ;                   % Viscosity
+omega = 2*pi*freq;          % Angular frequency
 
 Oval_y = 2 + (0:N)*h;
 Oval_y = Oval_y';
@@ -128,7 +130,7 @@ contour(xgrid,ygrid,vorticity,values)
 hold on
 plot(Xm(:,1),Xm(:,2),'ko')
 plot(Xwall(:,1),Xwall(:,2),'rs')
-plot(Xround(:,1),Xround(:,2),'rs')
+%plot(Xround(:,1),Xround(:,2),'rs')
 plot(Xoval(:,1),Xoval(:,2),'bd')
 axis([0,40*L,0,4*L])
 %caxis(valminmax)
